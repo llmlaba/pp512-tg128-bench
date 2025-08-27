@@ -1,15 +1,15 @@
 import argparse
 from rich.console import Console
 import torch, transformers as _tf
-from ptllmbench.version import VERSION
-from ptllmbench.config import ModelConfig, BenchConfig, TestSpec
-from ptllmbench.models.loader import ModelLoader
-from ptllmbench.utils.gpu import detect_backend, device_string
-from ptllmbench.utils.render import render_header, render_table, render_footer
-from ptllmbench.tests.pp.data import make_random_prompt
-from ptllmbench.tests.pp.test import run_pp
-from ptllmbench.tests.tg.data import make_start_prompt
-from ptllmbench.tests.tg.test import run_tg
+from src.ptllmbench.version import VERSION
+from src.ptllmbench.config import ModelConfig, BenchConfig, TestSpec
+from src.ptllmbench.models.loader import ModelLoader
+from src.ptllmbench.utils.gpu import detect_backend, device_string
+from src.ptllmbench.utils.render import render_header, render_table, render_footer
+from src.ptllmbench.tests.pp.data import make_random_prompt
+from src.ptllmbench.tests.pp.test import run_pp
+from src.ptllmbench.tests.tg.data import make_start_prompt
+from src.ptllmbench.tests.tg.test import run_tg
 
 def human_params(model) -> str:
     try:

@@ -1,5 +1,5 @@
 import torch
-from ptllmbench.tests.base import make_attention_mask
+from src.ptllmbench.tests.base import make_attention_mask
 
 def make_start_prompt(tok, batch: int, device):
     bos = tok.bos_token_id or 1

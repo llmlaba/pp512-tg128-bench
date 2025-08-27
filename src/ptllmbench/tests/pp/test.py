@@ -1,6 +1,6 @@
 import torch
-from ptllmbench.timing.timer import time_repeated, summarize_times
-from ptllmbench.tests.base import TestResult
+from src.ptllmbench.timing.timer import time_repeated, summarize_times
+from src.ptllmbench.tests.base import TestResult
 
 def _pp_once(model, x, attn, ubatch: int|None):
     seqlen = x.shape[1]
