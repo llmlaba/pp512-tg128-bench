@@ -1,6 +1,6 @@
 import torch
-from src.ptllmbench.timing.timer import time_repeated, summarize_times
-from src.ptllmbench.tests.base import TestResult
+from src.timing.timer import time_repeated, summarize_times
+from src.tests.base import TestResult
 
 def run_tg(model, x0, attn0, gen_len: int, warmup: int, iters: int, device: str) -> TestResult:
     def timed_decode():

@@ -1,5 +1,5 @@
 import torch
-from src.ptllmbench.tests.base import replace_special_ids, make_attention_mask
+from src.tests.base import replace_special_ids, make_attention_mask
 
 def make_random_prompt(tok, batch: int, seqlen: int, device):
     x = torch.randint(0, tok.vocab_size, (batch, seqlen), dtype=torch.long, device=device)

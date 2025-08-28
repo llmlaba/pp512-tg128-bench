@@ -1,7 +1,7 @@
 from typing import Tuple
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from src.ptllmbench.config import ModelConfig
+from src.config import ModelConfig
 
 def parse_dtype(name: str) -> torch.dtype:
     n = name.lower()
