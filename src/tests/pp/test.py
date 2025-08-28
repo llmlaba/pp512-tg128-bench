@@ -1,8 +1,9 @@
 import torch
 from src.timing.timer import time_repeated, summarize_times
 from src.tests.base import TestResult
+from typing import Optional
 
-def _pp_once(model, x, attn, ubatch: int|None):
+def _pp_once(model, x, attn, ubatch: Optional[int]):
     seqlen = x.shape[1]
     if not ubatch or ubatch >= seqlen:
         _ = model(input_ids=x, attention_mask=attn, use_cache=True); return
@@ -15,7 +16,7 @@ def _pp_once(model, x, attn, ubatch: int|None):
         past = out.past_key_values
         pos += chunk.shape[1]
 
-def run_pp(model, x, attn, warmup: int, iters: int, ubatch: int|None, device: str) -> TestResult:
+def run_pp(model, x, attn, warmup: int, iters: int, ubatch: Optional[int], device: str) -> TestResult:
     fn = lambda: _pp_once(model, x, attn, ubatch)
     times = time_repeated(fn, warmup, iters, device)
     t_med, t_mean, t_std = summarize_times(times)
