@@ -41,6 +41,7 @@ def main(argv=None):
     ap.add_argument('--dtype', type=str, default='fp16', choices=['fp16','bf16','fp32'])
     ap.add_argument('--quant', type=str, default='none', choices=['none','4bit'])
     ap.add_argument('--attn', type=str, default='sdpa')
+    ap.add_argument('--deepspeed', action='store_true', help='Enable DeepSpeed inference (not compatible with quantization)')
     ap.add_argument('--warmup', type=int, default=3)
     ap.add_argument('--iters', type=int, default=10)
     ap.add_argument('--ubatch', type=int, default=0)
@@ -49,7 +50,7 @@ def main(argv=None):
     if not torch.cuda.is_available():
         console.print('[yellow]WARNING[/]: CUDA/ROCm device not available; running on CPU will be slow.')
 
-    model_cfg = ModelConfig(model_id=args.model, dtype=args.dtype, attn_impl=args.attn, quant=args.quant)
+    model_cfg = ModelConfig(model_id=args.model, dtype=args.dtype, attn_impl=args.attn, quant=args.quant, deepspeed=bool(args.deepspeed))
     bench_cfg = BenchConfig(batch=args.batch, warmup=args.warmup, iters=args.iters)
     tests = parse_tests(args.tests)
 

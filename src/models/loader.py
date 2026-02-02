@@ -17,16 +17,32 @@ class ModelLoader:
         tok = AutoTokenizer.from_pretrained(self.cfg.model_id, use_fast=True)
         dtype = parse_dtype(self.cfg.dtype)
         attn_impl = self.cfg.attn_impl
-        if self.cfg.quant == 'none':
-            model = AutoModelForCausalLM.from_pretrained(self.cfg.model_id, torch_dtype=dtype, attn_implementation=attn_impl, low_cpu_mem_usage=self.cfg.low_cpu_mem_usage).to('cuda').eval()
-            device = torch.device('cuda')
+        # Validate incompatible options
+        if getattr(self.cfg, 'deepspeed', False) and self.cfg.quant != 'none':
+            raise ValueError("DeepSpeed inference is not supported together with quantization. Use --quant none or disable --deepspeed.")
+        if getattr(self.cfg, 'deepspeed', False):
+            if not torch.cuda.is_available():
+                raise RuntimeError("DeepSpeed requires a CUDA device. Please run on a GPU machine or disable --deepspeed.")            
+            import deepspeed
+            model = AutoModelForCausalLM.from_pretrained(self.cfg.model_id, torch_dtype=dtype, attn_implementation=attn_impl, low_cpu_mem_usage=self.cfg.low_cpu_mem_usage)
+            device = torch.device('cuda')      
+            # Use DeepSpeed inference kernel injection
+            model = deepspeed.init_inference(
+                model,
+                mp_size=1,
+                dtype=dtype,
+                replace_with_kernel_inject=True,
+            )
+            # Ensure eval mode
+            model.eval()        
         elif self.cfg.quant == '4bit':
             from transformers import BitsAndBytesConfig
             qconf = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type='nf4', bnb_4bit_use_double_quant=False, bnb_4bit_compute_dtype=torch.float16 if dtype==torch.float16 else torch.bfloat16)
             model = AutoModelForCausalLM.from_pretrained(self.cfg.model_id, quantization_config=qconf, torch_dtype=dtype, attn_implementation=attn_impl, device_map='auto').eval()
             device = next(model.parameters()).device
-        else:
-            raise ValueError("quant must be 'none' or '4bit'")
+        else: #default run
+            model = AutoModelForCausalLM.from_pretrained(self.cfg.model_id, torch_dtype=dtype, attn_implementation=attn_impl, low_cpu_mem_usage=self.cfg.low_cpu_mem_usage).to('cuda').eval()
+            device = torch.device('cuda')
         try:
             torch.backends.cuda.matmul.allow_tf32 = True
         except Exception:

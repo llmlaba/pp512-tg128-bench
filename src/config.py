@@ -7,6 +7,7 @@ class ModelConfig:
     attn_impl: str = 'sdpa'
     quant: str = 'none'
     low_cpu_mem_usage: bool = True
+    deepspeed: bool = False
 
 @dataclass
 class BenchConfig:
